@@ -75,15 +75,15 @@ def main(args):
 		args.amount = 1
 	
 	#check if user is joking
-	if args.input == args.output:
-		print('ERROR: Input and Output arguments are same, no calculation done')
-		calculate_print_output(amount=args.input, output=args.output, raw=args.raw)
-		exit()
 	#if no input is provided, use EUR
-	elif args.input is None:
+	if args.input is None:
 		if args.verbose:  print('WARNING: No input currency provided, using value "EUR"')
 		args.input = 'EUR'
 		#TODO print out only supported currencies
+	elif args.input == args.output:
+		print('ERROR: Input and Output arguments are same, no calculation done')
+		calculate_print_output(amount=args.input, output=args.output, raw=args.raw)
+		exit()
 	
 	#now we can get the currency_rates from fixer
 	fixer_output = get_currency_rates(args.input)
