@@ -33,10 +33,3 @@ supported_currencies = {
 'TRY': {'country': 'Turkey', 'currency': 'Lira', 'font': None},
 'USD': {'country': 'United States', 'currency': 'Dollar', 'font': '$'},
 'ZAR': {'country': 'South Africa', 'currency': 'Rand', 'font': 'R'}}
-
-#TODO have a function which will make all this based on supported_currencies
-same_fonts={
-"$" : ['Australia [AUD]', 'Canada [CAD]', 'Honk Kong [HKD]', 'Mexico [MXN]', 'New Zealand [NZD]', 'Philippines [PHP]', 'Singapore [SGD]', 'United States [USD]'],
-"¥" : ['China [CNY]', 'Japan [JPY]'],
-"kr" : ['Denmark [DKK]', 'Norway [NOK]', 'Sweden [SEK]']
-}
