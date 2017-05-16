@@ -79,10 +79,10 @@ def validate_currency(user_input):
 		if user_input.upper() == currency_code:
 			return currency_code
 		#if its unique_font, always compare in lowercase
-		elif currency_data['font'].lower() == user_input.lower():
+		elif currency_data['font'] is not None and currency_data['font'].lower() == user_input.lower():
 			return currency_code
 
-	print('ERROR: Output currency', args.output, 'not supported.')
+	print('ERROR: Currency', user_input, 'not supported.')
 	print('Supported currencies are:','|'.join(currency for currency in CONST.supported_currencies.keys()))
 	exit()
 
@@ -94,7 +94,7 @@ def get_currency_rates(base):
 	r = requests.get('https://api.fixer.io/latest?base=' + base)
 	if r.ok: return r.json()
 
-def calculate_print_output(amount = 1.0, output=None, raw=False):
+def calculate_print_output(amount=1.0, cinput=None, coutput=None, raw=False, verbose=False):
 	'''
 	builds final output, input from args, output whatever dict
 	if raw is true, print whole dict
@@ -103,29 +103,30 @@ def calculate_print_output(amount = 1.0, output=None, raw=False):
 	#build dict and input
 	result = {}
 	result['input'] = {}
-	result['input']['amount'] = args.amount
-	result['input']['currency'] = args.input
+	result['input']['amount'] = amount
+	result['input']['currency'] = cinput
 
 	#append output key depending if to print one or more currencies
 	result['output'] = {}
-	if isinstance(output, float): #output is exchange rate from fixer.io, add just one
-		result['output'][args.output] = float('{0:.3f}'.format(output * amount))
-	elif isinstance(output, dict): #output is all rates, add all
-		for currency, value in output.items():
+	if isinstance(coutput, tuple): #output is tuple of country_code and xchange rate from fixer.io, add just one
+		result['output'][coutput[0]] = float('{0:.3f}'.format(coutput[1] * amount))
+	elif isinstance(coutput, dict): #output is all rates, add all
+		for currency, value in coutput.items():
 			result['output'][currency] = float('{0:.3f}'.format(value * amount))
-	elif isinstance(output, str): #user provided same input and output, no calculation
-		result['output'][args.output] = float('{0:.3f}'.format(args.amount))
+	elif isinstance(coutput, str): #user provided same input and output, no calculation
+		result['output'][coutput] = float('{0:.3f}'.format(amount))
 
 	if raw:
-		if args.verbose: print('returning raw dict')
+		if verbose: print('returning raw dict')
 		print(result)
 	else:
-		if args.verbose: print('returning prettified JSON')
-		'''in Python 3.6 sorting keys should not needed, since we get the data in order
-		for more info about why we can trust the order in dicts now see:
+		if verbose: print('returning prettified JSON')
+		'''in Python 3.6 sorting keys should not be needed, since we get the data in order
+		for more info about why we can "trust" the order in dicts now see:
 		https://www.youtube.com/watch?v=p33CVV29OG8
-                for some reason EUR is on the last when sorting is off, rather have it on'''
-		print(json.dumps(result, indent=4, sort_keys=True))
+        but for some reason EUR is moved is on the last pos when sorting is off,
+		rather have it on'''
+		print(json.dumps(result, indent=4, sort_keys=False))
 
 def main(args):
 	'''main logic of convert_currency.py
@@ -133,52 +134,51 @@ def main(args):
 	use validate_currency() to get country_code
 	then use get_currency_rates(country_code)
 	then calculate_print_output() for one or all countries'''
-
+	print(args)
 	#validate amount
 	##amount is not required, default is 1
 	if args.amount is None:
 		if args.verbose: print('WARNING: No amount provided, using value "1"')
 		args.amount = 1
-	#it can't be negative
+	##its not none, but it can't be negative
 	elif int(args.amount) < 0:
 		print('ERROR: Won\'t calculate negative amount')
 		exit()
 
-	#prevalidate output - check if its symbol or currency code and get country_code
-	if args.output is not None:
-		validated_args_output = validate_currency(args.output) #can cause exit on bad input
-
-	#validate input
-	##if no input is provided, use EUR
-	if args.input is None:
+	#prevalidate input/output - check if its symbol or currency code and get country_code
+	#validate_currency() can cause exit when user provides symbol for multiple countries
+	if args.input is not None:
+		validated_args_input = validate_currency(args.input)
+	elif args.input is None:
+		##if no input is provided, use EUR
 		if args.verbose: print('WARNING: No input currency provided, using value "EUR"')
-		args.input = 'EUR'
-	elif args.input is not None:
-		#get country_code
-		args.input = validate_currency(args.input) #can cause exit on bad input
-	##check if user provided same input and output currencies
-	elif args.input == validated_args_output:
-		print('ERROR: Input and Output arguments are same, no calculation done')
-		#pass output as user provided output, which is same as user provided input
-		calculate_print_output(amount=args.input, output=args.output, raw=args.raw)
-		exit()
+		validated_args_input = 'EUR'
 
+	if args.output is not None:
+		validated_args_output = validate_currency(args.output)
+		#check if user provided same input and output currencies
+		if validated_args_input == validated_args_output:
+			print('ERROR: Input and Output arguments are same, no calculation done')
+			#pass output as user provided output, which is same as user provided input
+			calculate_print_output(amount=args.amount, cinput=validated_args_input, coutput=validated_args_output, raw=args.raw, verbose=args.verbose)
+			exit()
+
+	#got validated_args_input and validated_args_output
 	#now we can get the currency_rates from fixer
-	fixer_output = get_currency_rates(args.input)
+	fixer_output = get_currency_rates(validated_args_input)
 
 	#if we got fixer_output, continue
 	if fixer_output:
 		if args.output is None:
-			if args.verbose: print('No output value provided converting to all known currencies, using base currency', args.input)
+			if args.verbose: print('No output value provided converting to all known currencies, using base currency', validated_args_input)
 			#pass output as all exchange_rates
-			calculate_print_output(amount=args.amount, output=fixer_output['rates'], raw=args.raw)
-
+			calculate_print_output(amount=args.amount, cinput=validated_args_input, coutput=fixer_output['rates'], raw=args.raw, verbose=args.verbose)
 		#otherwise print out just the output currency
 		else:
-			calculate_print_output(amount=args.amount, output=fixer_output['rates'][validated_args_output], raw=args.raw)
+			calculate_print_output(amount=args.amount, cinput=validated_args_input, coutput=(validated_args_output, fixer_output['rates'][validated_args_output]), raw=args.raw, verbose=args.verbose)
 	else:
 		print('ERROR: failed to get currency_rates')
-		calculate_print_output(amount=args.amount, output=None, raw=args.raw)
+		calculate_print_output(amount=args.amount, cinput=validated_args_input, coutput=None, raw=args.raw, verbose=args.verbose)
 
 if __name__ == '__main__':
 	args = parser.parse_args()
