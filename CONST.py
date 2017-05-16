@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 supported_currencies = {
 'AUD': {'country': 'Australia', 'currency': 'Dollar', 'font': '$'},
 'BGN': {'country': 'Bulgaria', 'currency': 'Lev', 'font': 'лв'},

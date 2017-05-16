@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import argparse
 import json
 import requests
@@ -92,10 +93,11 @@ def calculate_print_output(amount = 1.0, output=None, raw=False):
 		print(result)
 	else:
 		if args.verbose: print('returning prettified JSON')
-		"""in Python 3.6 sorting keys is not needed, since we get the data in order
+		"""in Python 3.6 sorting keys should not needed, since we get the data in order
 		for more info about why we can trust the order in dicts now see:
-		https://www.youtube.com/watch?v=p33CVV29OG8"""
-		print(json.dumps(result, indent=4, sort_keys=False))
+		https://www.youtube.com/watch?v=p33CVV29OG8
+                for some reason EUR is on the last when sorting is off, rather have it on"""
+		print(json.dumps(result, indent=4, sort_keys=True))
 
 def main(args):
 	"""main logic of convert_currency.py

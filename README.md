@@ -1,7 +1,27 @@
 # convert_currency
-Converts input amount to any output from fixer.io
+Convert currency using fixer.io amount can be any non-negative float input and
+output can be 3 letter currency code or currency symbol when no parameters are
+provided script returns exchange rates for 1 EUR when no output parameter is
+provided, script returns all supported exchange rates please note that for
+example currency symbol "$" is used in many countries, script will ask to
+provide specific country code in such cases.
 
 requires [requests module](http://docs.python-requests.org/en/master/) for sane working with HTTP
+
+# usage
+usage: convert_currency.py [-h] [-A AMOUNT] [-I INPUT] [-O OUTPUT] [-R] [-v]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -A AMOUNT, --amount AMOUNT
+                        amount of money to convert
+  -I INPUT, --input INPUT
+                        input currency - 3 letters name or currency symbol
+  -O OUTPUT, --output OUTPUT
+                        output currency - 3 letters name or currency symbol
+  -R, --raw             returns raw Python dict instead of formatted JSON
+  -v, --verbose         prints out unimportant stuff, opposite of silent
+
 
 # supported currencies
 	* <Currency Code> - <Country and Currency> - [<Font>]
