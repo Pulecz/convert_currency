@@ -146,9 +146,9 @@ def calculate_print_output(amount=1.0, cinput=None, coutput=None, raw=False, ver
         but for some reason EUR is moved is on the last pos when sorting is off,
 		rather have it on'''
 		if test:
-			return json.dumps(result, indent=4, sort_keys=False)
+			return json.dumps(result, indent=4, sort_keys=True)
 		else:
-			print(json.dumps(result, indent=4, sort_keys=False))
+			print(json.dumps(result, indent=4, sort_keys=True))
 
 def main(args):
 	'''main logic of convert_currency.py

@@ -16,7 +16,7 @@ class Args_for_convert_currency:
 class TestStringMethods(unittest.TestCase):
     '''main TestCases'''
     def test_get_currency_rates(self):
-        "test if get_currency_rates(base) returns dict, base is default EUR"
+        'test if get_currency_rates(base) returns dict, base is default EUR'
         self.assertIsInstance(convert_currency.get_currency_rates('EUR'), dict)
 
     def test_default_run(self):
@@ -96,18 +96,53 @@ class TestStringMethods(unittest.TestCase):
                 print(currency_data['font'], 'is non unique')
                 continue
 
-    #TODO
     def test_calculate_print_output_1(self):
-        #tuple
-        pass
+        '''
+        test case when specific input and output is provided
+        get EUR rates
+        pass coutput tuple of CZK to get only exchange_rates for CZK
+        test if calculate_print_output returns ['output']['CZK'] and its a float
+        '''
+        fixer_output = convert_currency.get_currency_rates('EUR')
+        output = convert_currency.calculate_print_output(amount=1,
+         cinput='EUR',
+         coutput=('CZK', fixer_output['rates']['CZK']),
+         raw=True,
+         verbose=False,
+         test=True)
+        self.assertIsInstance(output['output']['CZK'], float)
 
     def test_calculate_print_output_2(self):
-        #dict
+        '''
+        test case when no output is passed
+        get CZK rates
+        pass coutput dict of all the rates
+        test if calculate_print_output returns ['output'][<all_currencies>] and all are float
+        '''
+        fixer_output = convert_currency.get_currency_rates('CZK')
+        output = convert_currency.calculate_print_output(amount=1,
+         cinput='CZK',
+         coutput=(fixer_output['rates']),
+         raw=True,
+         verbose=False,
+         test=True)
+        for line in output['output']:
+            self.assertIsInstance(output['output'][line], float)
         pass
 
     def test_calculate_print_output_3(self):
-        #str
-        pass
+        '''
+        test case when input and output is same
+        pass coutput string 'CZK'
+        test if calculate_print_output returns ['output']['CZK'] and its a float
+        '''
+        output = convert_currency.calculate_print_output(amount=1,
+         cinput='CZK',
+         coutput='CZK',
+         raw=True,
+         verbose=False,
+         test=True)
+        self.assertIsInstance(output['output']['CZK'], float)
 
 if __name__ == '__main__':
     unittest.main()
