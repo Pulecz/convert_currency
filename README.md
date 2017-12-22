@@ -17,21 +17,26 @@ exit codes:
 
 Requires [requests module](http://docs.python-requests.org/en/master/) for sane working with HTTP.
 
-# usage
+originally based on task https://gist.github.com/MichalCab/3c94130adf9ec0c486dfca8d0f01d794 (branch forced_by_assigment)
 
-  usage: convert_currency.py [-h] [-A AMOUNT] [-I INPUT] [-O OUTPUT] [-R] [-v]
+# usage
+  
+  usage: convert_currency.py [-h] [-R] [-v] [--unittest]
+                           amount input [output [output ...]]
+
+  positional arguments:
+
+    amount         amount of money to convert
+    input          input currency - 3 letters name or currency symbol
+    output         output currency - 3 letters name or currency symbol
 
   optional arguments:
 
     -h, --help            show this help message and exit
-    -A AMOUNT, --amount AMOUNT
-                          amount of money to convert
-    -I INPUT, --input INPUT
-                          input currency - 3 letters name or currency symbol
-    -O OUTPUT, --output OUTPUT
-                          output currency - 3 letters name or currency symbol
     -R, --raw             returns raw Python dict instead of formatted JSON
     -v, --verbose         prints out unimportant stuff, opposite of silent
+    --unittest            only for unittest runs, doesn't print output
+
 
 # supported currencies
 
@@ -74,5 +79,7 @@ To run all test run:
 ```bash
 $ python -m unittest
 ```
+
+NOTE: currently one test in tests_long.py fails, need simplification
 
 or launch test.py for shorter tests, or tests_long.py for all possible test
